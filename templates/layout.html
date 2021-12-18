@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}{% endblock %}</title>
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo/favicon.png') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/custom/css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/toastr/css/toastr.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/custom/css/scroll-to-top.css') }}">
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='libs/assets/vendor/nucleo/css/nucleo.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='libs/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='libs/assets/css/argon.css') }}">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+
+</head>
+
+<body>
+
+    <nav id="navbar-main" class="navbar navbar-horizontal navbar-transparent navbar-main navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="dashboard.html">
+                <img src="{{ url_for('static', filename='images/logo/w-logo.png') }}">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
+                aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse navbar-custom-collapse collapse" id="navbar-collapse">
+                <div class="navbar-collapse-header">
+                    <div class="row">
+                        <div class="col-6 collapse-brand">
+                            <a href="dashboard.html">
+                                <img src="{{ url_for('static', filename='images/logo/w-logo.png') }}">
+                            </a>
+                        </div>
+                        <div class="col-6 collapse-close">
+                            <button type="button" class="navbar-toggler" data-toggle="collapse"
+                                data-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false"
+                                aria-label="Toggle navigation">
+                                <span></span>
+                                <span></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a href="./" class="nav-link">
+                            <span class="nav-link-inner--text">Iniciar sesión</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="./registrarse" class="nav-link">
+                            <span class="nav-link-inner--text">Registrarse</span>
+                        </a>
+                    </li>
+                </ul>
+                <hr class="d-lg-none" />
+                <ul class="navbar-nav align-items-lg-center ml-lg-auto">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-icon" href="https://www.youtube.com/gvideosmtutorialesgm"
+                            target="_blank" data-toggle="tooltip" data-original-title="Follow us on YouTube Channel">
+                            <i class="fab fa-youtube"></i>
+                            <span class="nav-link-inner--text d-lg-none">YouTube</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-icon" href="https://twitter.com/antoniomorenosm" target="_blank"
+                            data-toggle="tooltip" data-original-title="Follow us on Twitter">
+                            <i class="fab fa-twitter-square"></i>
+                            <span class="nav-link-inner--text d-lg-none">Twitter</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-icon" href="https://github.com/jersonmartinez/" target="_blank"
+                            data-toggle="tooltip" data-original-title="Star us on Github">
+                            <i class="fab fa-github"></i>
+                            <span class="nav-link-inner--text d-lg-none">GitHub</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="main-content">
+        <div class="header bg-gradient-primary py-7 py-lg-8 pt-lg-9">
+            <div class="container">
+                <div class="header-body text-center mb-7">
+                    <div class="row justify-content-center">
+                        <div class="col-xl-5 col-lg-6 col-md-8 px-5">
+                            <h1 class="text-white">¡Bienvenido!</h1>
+                            <p class="text-lead text-white">No es que no haya dinero, es que no hay buena administración.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container mt--8 pb-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-5 col-md-7">
+                    <div class="card bg-secondary border-0 mb-0">
+                        <div class="card-body px-lg-5 py-lg-5">
+                            <div class="text-center text-muted mb-4">
+                                <img src="{{ url_for('static', filename='images/logo/logo.png') }}"><br/>
+                            </div>
+                            <form role="form" id="FormAdminLogin">
+                                <div class="form-group mb-3">
+                                    <div class="input-group input-group-merge input-group-alternative">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="ni ni-circle-08"></i></span>
+                                        </div>
+                                        <input class="form-control" id="login_username" placeholder="Nombre de usuario" type="text">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group input-group-merge input-group-alternative">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                                        </div>
+                                        <input class="form-control" id="login_password" placeholder="Contraseña" type="password">
+                                    </div>
+                                </div>
+                                <div class="custom-control custom-control-alternative custom-checkbox">
+                                    <input class="custom-control-input" id="customCheckLogin" type="checkbox">
+                                    <label class="custom-control-label" for=" customCheckLogin">
+                                        <span class="text-muted">Recuérdame</span>
+                                    </label>
+                                </div>
+                                <div class="text-center">
+                                    <button type="button" class="btn btn-primary my-4">Iniciar sesión</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="py-5" id="footer-main">
+        <div class="container">
+            <div class="row align-items-center justify-content-xl-between">
+                <div class="col-xl-12">
+                    <div class="copyright text-center text-muted">
+                        &copy; 2021 <a href="https://www.crashell.com" class="font-weight-bold ml-1"
+                            target="_blank">Crashell</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <a href="#" class="scroll-top text-center" id="ScrollToTop">
+        <i class="fas fa-angle-double-up"></i>
+    </a>
+
+    <script src="{{ url_for('static', filename='libs/assets/vendor/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='libs/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='libs/assets/vendor/js-cookie/js.cookie.js') }}"></script>
+    <script src="{{ url_for('static', filename='libs/assets/vendor/jquery.scrollbar/jquery.scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='libs/assets/vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='libs/assets/vendor/chart.js/dist/Chart.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='libs/assets/vendor/chart.js/dist/Chart.extension.js') }}"></script>
+    <script src="{{ url_for('static', filename='libs/assets/js/argon.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='libs/toastr/js/toastr.js') }}"></script>
+    <script src="{{ url_for('static', filename='libs/custom/js/global.js') }}"></script>
+    <script src="{{ url_for('static', filename='libs/custom/js/dashboard.js') }}"></script>
+
+</body>
+
+</html>

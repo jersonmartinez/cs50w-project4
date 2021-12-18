@@ -1,0 +1,11 @@
+{% if session["username"] %}
+    {% extends 'dashboard.html' %} 
+{% else %}
+    {% extends 'layout.html' %} 
+{% endif %}
+
+{% block title %} Factible {% endblock %} 
+
+{% block main %}
+
+{% endblock %}

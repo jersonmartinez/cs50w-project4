@@ -1,0 +1,8 @@
+#.
+flask_session/
+__pycache__/
+include/
+Lib/
+Scripts/
+./pyvenv.cfg
+./env.sh
