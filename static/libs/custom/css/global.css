@@ -461,11 +461,11 @@ ul.cs-social-list a:hover {
     border-radius: 4px;
 }
 
-.tr_list_accounts {
+.tr_list_accounts, .tr_list_movements {
     cursor: pointer;
 }
 
-.tr_list_accounts:hover {
+.tr_list_accounts:hover, .tr_list_movements:hover {
     background-color: #f6f9fc !important;
     transition: margin-left 4s, color 1s;
     border-radius: 4px;

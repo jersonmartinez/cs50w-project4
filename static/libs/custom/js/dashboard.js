@@ -2,6 +2,7 @@ var currency = "";
 var update_currency = "";
 var data_accounts = "";
 var data_movements = "";
+var select_account = "Ninguna";
 
 Spinner = '<div class="d-flex justify-content-center">' +
     '   <div class="spinner-border text-warning" style="margin-top: 20px; margin-bottom: 50px;" role="status" id="spinner_status_loading_accounts">' +
@@ -13,10 +14,15 @@ $(document).ready(function() {
 
     change_badge_type($('#cb-badge-create-account').is(':checked'));
     update_badge_type($('#cb-badge-update-account').is(':checked'));
+    update_badge_type($('#cb-badge-update-movement').is(':checked'));
     // getAccounts();
 
     $('#cb-badge-create-account').click(() => {
         change_badge_type($('#cb-badge-create-account').is(':checked'));
+    });
+
+    $('#cb-badge-update-movement').click(() => {
+        change_badge_type($('#cb-badge-update-movement').is(':checked'));
     });
 
     $('#cb-badge-update-account').click(() => {
@@ -72,6 +78,10 @@ $(document).ready(function() {
         if (e.which == 13)
             updateMovement();
     }
+
+    $('#delete_movement_submit').click(() => {
+        deleteMovement();
+    });
 
     $('#update_movement_submit').click(() => {
         updateMovement();
@@ -212,10 +222,10 @@ function getAccounts() {
                     Data += '<tr onclick="javascript: getAccountById(this);" data-toggle="modal" data-target="#modal-notification-control-cuenta" id="tr_item_account_' + data_accounts[i].id + '" id_account="' + data_accounts[i].id +'" class="tr_list_accounts">' +
                         '    <th scope="row">' + data_accounts[i].name + '</th>' +
                         '    <td>' + data_accounts[i].currency + '</td>' +
-                        '    <td>' + data_accounts[i].currency + data_accounts[i].amount + '</td>' +
-                        '    <td>' + data_accounts[i].currency + data_accounts[i].amount + '</td>' +
+                        '    <td>' + data_accounts[i].currency + data_accounts[i].amount + '.00' + '</td>' +
+                        '    <td>' + data_accounts[i].currency + data_accounts[i].amount + '.00' + '</td>' +
                         '    <td>' + data_accounts[i].description + '</td>' +
-                        '    <td>' + '<i class="fas fa-arrow-up text-success mr-3"></i> 00,00%' + '</td>' +
+                        '    <td>' + '<i class="fas fa-arrow-up text-success mr-3"></i>' + '</td>' +
                         '</tr>';
                 }
                 
@@ -225,15 +235,25 @@ function getAccounts() {
     });
 }
 
-function getAccountsForMovements() {
+function getAccountsForMovements(value) {
     LabelSelectAccount = '<label for="SelectAccountMovement">Seleccione una cuenta</label>';
     InitSelectAccount = '<select class="form-control" id="SelectAccountMovement">';
     FinishSelectAccount = '</select>';
-    OptionDefaultSelectAccount = '<option>Ninguna</option>';
+    OptionDefaultSelectAccount = '<option onclick="javascript: update_SelectAccountMovement(\'Ninguna\')">Ninguna</option>';
 
-    // $("#ListAccountsMovement").html(LabelSelectAccount + Spinner);
-    $("#ListAccountsMovement").html(Spinner);
+    var AccountMovementValue = "";
+
+    if (value == 'Nuevo') {
+        AccountMovementValue = 'ListAccountsMovement';
+    } else if (value == 'Update') {
+        AccountMovementValue = 'UpdateListAccountsMovement';
+    }
+
+    $("#" + AccountMovementValue).html(LabelSelectAccount + Spinner);
+    //$(".ListAccountsMovement").html(Spinner);
     
+    console.log("AccountMovementValue: " + AccountMovementValue);
+
     Data = "";
 
     $.ajax({
@@ -249,11 +269,11 @@ function getAccountsForMovements() {
                 console.log(data_accounts);
 
                 for (var i = 0; i < data_accounts.length; i++) {
-                    Data += '<option>' + data_accounts[i].name + '</option>';
+                    Data += '<option onclick="javascript: update_SelectAccountMovement(\'' + data_accounts[i].name + '\')">' + data_accounts[i].name + '</option>';
                 }
 
-                // $("#ListAccountsMovement").html(LabelSelectAccount + InitSelectAccount + OptionDefaultSelectAccount + Data + FinishSelectAccount);
-                $("#SelectAccountMovement").html(Data);
+                $("#" + AccountMovementValue).html(LabelSelectAccount + InitSelectAccount + OptionDefaultSelectAccount + Data + FinishSelectAccount);
+                //$("#SelectAccountMovement").html(Data);
             }
         }
     });
@@ -321,9 +341,14 @@ function createAccount(){
     }
 }
 
+function update_SelectAccountMovement(value) {
+    select_account = value;
+}
+
 function createMovement(){
     var type_charge = $('input[name="customRadioInline1"]:checked').val(),
-        account     = $('select[name="SelectAccountMovement"] option').filter(':selected').val(),
+        // account     = $('select[name="SelectAccountMovement"] option').filter(':selected').val(),
+        account     = select_account,
         tag         = $('select[name="SelectTagMovement"] option').filter(':selected').val(),
         date        = $('#SelectDateMovement').val(),
         amount      = $('#amount_movement').val(),
@@ -374,7 +399,6 @@ function getMovements() {
         '                <th scope="col">Categoría</th>' +
         '                <th scope="col">Monto</th>' +
         '                <th scope="col">Cuenta</th>' +
-        '                <th scope="col">Divisa</th>' +
         '                <th scope="col">Fecha</th>' +
         '                <th scope="col">Cargo</th>' +
         '            </tr>' +
@@ -386,7 +410,7 @@ function getMovements() {
 
     Finish = '</div>';
 
-    ButtomCreateMovement = '<a href="#" class="btn btn-sm btn-neutral" data-toggle="modal" data-target="#modal-notification-nuevo-movimiento">Crear un movimiento</a>';
+    ButtomCreateMovement = '<a href="#" class="btn btn-sm btn-neutral" onclick="javascript: getAccountsForMovements(\'Nuevo\');" data-toggle="modal" data-target="#modal-notification-nuevo-movimiento">Crear un movimiento</a>';
 
     $("#dashboard_movements").html(Initial + Finish + Spinner);
 
@@ -406,15 +430,23 @@ function getMovements() {
 
                 for (var i = 0; i < data_movements.length; i++) {
 
-                    Data += '<tr onclick="javascript: getMovementById(this);" data-toggle="modal" data-target="#modal-notification-nuevo-movimiento" id="tr_item_movement_' + data_movements[i].id + '" id_movement="' + data_movements[i].id + '" class="tr_list_movement">' +
+                    if (data_movements[i].type_charge == 'Ingreso')
+                        icon = '<i class="fas fa-arrow-up text-success mr-3" title="' + data_movements[i].type_charge + '"></i>';
+                    else
+                        icon = '<i class="fas fa-arrow-down text-warning mr-3" title="' + data_movements[i].type_charge + '"></i>';
+
+                    if (data_movements[i].account == '')
+                        account = 'Ninguna';
+                    else
+                        account = data_movements[i].account;
+
+                    Data += '<tr onclick="javascript: getMovementById(this);" data-toggle="modal" data-target="#modal-notification-control-movimiento" id="tr_item_movement_' + data_movements[i].id + '" id_movement="' + data_movements[i].id + '" class="tr_list_movements">' +
                         '    <th scope="row">' + data_movements[i].description + '</th>' +
                         '    <td>' + data_movements[i].tag + '</td>' +
-                        '    <td>' + data_movements[i].amount + '</td>' +
-                        '    <td>' + data_movements[i].account + '</td>' +
-                        '    <td>' + data_movements[i].currency + '</td>' +
+                        '    <td>' + data_movements[i].currency + data_movements[i].amount + '.00' + '</td>' +
+                        '    <td>' + account + '</td>' +
                         '    <td>' + data_movements[i].date + '</td>' +
-                        '    <td>' + data_movements[i].type_charge + '</td>' +
-                        '    <td>' + '<i class="fas fa-arrow-up text-success mr-3"></i> 00,00%' + '</td>' +
+                        '    <td>' + icon + '</td>' +
                         '</tr>';
                 }
 
@@ -422,6 +454,43 @@ function getMovements() {
             }
         }
     });
+}
+
+function getMovementById(value) {
+
+    getAccountsForMovements('Update');
+
+    id_movement = $(value).attr("id_movement");
+    data_label_off = "";
+    data_label_on = "";
+
+    for (var i = 0; i < data_movements.length; i++) {
+        if (data_movements[i].id == id_movement) {
+            update_currency = data_movements[i].currency;
+
+            if (data_movements[i].currency == '$') {
+                data_label_off = 'C$';
+                data_label_on = '$';
+            } else {
+                data_label_off = '$';
+                data_label_on = 'C$';
+            }
+
+            data_label_on = data_movements[i].currency;
+
+            $("#UpdateDateMovement").val(data_movements[i].date);
+            $("#update_description_movement").val(data_movements[i].description);
+            $("#update_amount_movement").val(data_movements[i].amount);
+            $("#UpdateTagMovement").val(data_movements[i].tag);
+            $("#type_charge_movement_update").val(data_movements[i].type_charge);
+            $("#currency_movement_update").val(data_movements[i].currency);
+            $("#UpdateAccountMovement").val(data_movements[i].account);
+            $("#modal-notification-control-movimiento #update_id_movement").val(data_movements[i].id);
+            $("#modal-notification-control-movimiento #span-update-badge-selected-movement").html(data_movements[i].currency);
+            $("#modal-notification-control-movimiento #cb-badge-update-movement").attr('data-label-on', data_label_on);
+            $("#modal-notification-control-movimiento #cb-badge-update-movement").attr('data-label-off', data_label_off);
+        }
+    }
 }
 
 function deleteAccount() {
@@ -436,6 +505,25 @@ function deleteAccount() {
 
                 $('#modal-notification-control-cuenta').modal('toggle');
                 getAccounts();
+            } else {
+                toastr["info"]("Intente más tarde", "Oops");
+            }
+        }
+    });
+}
+
+function deleteMovement() {
+    $.ajax({
+        data: { 'id': $('#update_id_movement').val() },
+        url: "/delete_movement",
+        type: "post",
+        success: function (datos) {
+            if (datos == "Ok") {
+                toastr["success"]("El movimiento ha sido eliminada", "Satisfactorio");
+                $('#FormUpdateMovement').trigger("reset");
+
+                $('#modal-notification-control-movimiento').modal('toggle');
+                getMovements();
             } else {
                 toastr["info"]("Intente más tarde", "Oops");
             }
@@ -473,6 +561,39 @@ function updateAccount() {
     }
 }
 
+function updateMovement() {
+    var id = $('#update_id_movement').val(),
+        type_charge = $('input[name="UpdatecustomRadioInline1"]:checked').val(),
+        account = select_account,
+        tag = $('select[name="UpdateTagMovement"] option').filter(':selected').val(),
+        date = $('#UpdateDateMovement').val(),
+        amount = $('#update_amount_movement').val(),
+        description = $('#update_description_movement').val();
+
+    if (description == '') {
+        toastr["info"]("Identifiquemos este movimiento", "¡No tan rápido!");
+    } else if (amount == '') {
+        toastr["info"]("Indique la cantidad", "¡No tan rápido!");
+    } else {
+        $.ajax({
+            data: { 'id': id, 'type_charge': type_charge, 'account': account, 'tag': tag, 'date': date, 'amount': amount, 'description': description, 'currency': currency },
+            url: "/update_movement",
+            type: "post",
+            success: function (datos) {
+                if (datos == "Ok") {
+                    toastr["success"]("El movimiento ha sido actualizado", "Satisfactorio");
+                    $('#FormUpdateMovement').trigger("reset");
+
+                    $('#modal-notification-control-movimiento').modal('toggle');
+                    getMovements();
+                } else {
+                    toastr["info"]("Intente más tarde", "Oops");
+                }
+            }
+        });
+    }
+}
+
 // change badge type checkbox state $ or C$
 function change_badge_type(value) {
     if (!value) {
@@ -481,6 +602,14 @@ function change_badge_type(value) {
     } else {
         currency = 'C$';
         $("#span-badge-selected").html("C$");
+    }
+    
+    if (!value) {
+        currency = '$';
+        $("#span-update-badge-selected-movement").html("$");
+    } else {
+        currency = 'C$';
+        $("#span-update-badge-selected-movement").html("C$");
     }
 }
 
@@ -492,5 +621,13 @@ function update_badge_type(value) {
     } else {
         update_currency = 'C$';
         $("#span-update-badge-selected").html("C$");
+    }
+
+    if (value) {
+        update_currency = '$';
+        $("#span-update-badge-selected-movement").html("$");
+    } else {
+        update_currency = 'C$';
+        $("#span-update-badge-selected-movement").html("C$");
     }
 }

@@ -325,6 +325,37 @@ def update_account():
     else:
         return 'Ok'
 
+@app.route("/update_movement", methods=['POST'])
+def update_movement():
+    id = request.form.get('id')
+    account = request.form.get('account')
+    date = request.form.get('date')
+    tag = request.form.get('tag')
+    type_charge = request.form.get('type_charge')
+    currency = request.form.get('currency')
+    amount = request.form.get('amount')
+    description = request.form.get('description')
+
+    result = db.execute("UPDATE movements SET account=:account, date=:date, tag=:tag, type_charge=:type_charge, currency=:currency, amount=:amount, description=:description WHERE id=:id", {"id": id, "account": account, "date": date, "tag": tag, "type_charge": type_charge, "currency": currency, "amount": amount, "description": description})
+
+    db.commit()
+    if not result:
+        return 'not_updated'
+    else:
+        return 'Ok'
+
+@app.route("/delete_movement", methods=['POST'])
+def delete_movement():
+    id = request.form.get('id')
+
+    result = db.execute("DELETE FROM movements WHERE id=:id", {"id": id})
+    db.commit()
+    
+    if not result:
+        return 'not_deleted'
+    else:
+        return 'Ok'
+
 @app.route("/delete_account", methods=['POST'])
 def delete_account():
     id = request.form.get('id')

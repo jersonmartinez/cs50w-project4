@@ -154,92 +154,14 @@
                 <div class="header-body">
                     <div class="row align-items-center py-4">
                         <div class="col-lg-12 col-12 text-right">
-                            <a href="#" class="btn btn-sm btn-neutral" onclick="javascript: getAccountsForMovements();" data-toggle="modal" data-target="#modal-notification-nuevo-movimiento">Nuevo movimiento</a>
+                            <a href="#" class="btn btn-sm btn-neutral" onclick="javascript: getAccountsForMovements('Nuevo');" data-toggle="modal" data-target="#modal-notification-nuevo-movimiento">Nuevo movimiento</a>
                             <!-- <a href="#" class="btn btn-sm btn-neutral">Filtro</a> -->
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-xl-12">
                             <div class="card" id="dashboard_movements">
-                                <div class="card-header border-0">
-                                    <div class="row align-items-center">
-                                        <div class="col">
-                                            <h3 class="mb-0">Movimientos</h3>
-                                        </div>
-                                        <div class="col text-right">
-                                            <a href="#!" class="btn btn-sm btn-primary">Ver todo</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table align-items-center table-flush">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th scope="col">Cuenta</th>
-                                                <th scope="col">Fecha</th>
-                                                <th scope="col">Descripción</th>
-                                                <th scope="col">Categoría</th>
-                                                <th scope="col">Monto</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <th scope="row">
-                                                    BAC
-                                                </th>
-                                                <td>
-                                                    2021/12/06
-                                                </td>
-                                                <td>
-                                                    Dentista
-                                                </td>
-                                                <td>
-                                                    Salud y Belleza
-                                                </td>
-                                                <td>
-                                                    <i class="fas fa-arrow-down text-warning mr-3"></i> $50.00
-                                                    <!-- <i class="fas fa-arrow-up text-success mr-3"></i> $50.00 -->
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">
-                                                    BAC
-                                                </th>
-                                                <td>
-                                                    2021/12/06
-                                                </td>
-                                                <td>
-                                                    Dentista
-                                                </td>
-                                                <td>
-                                                    Salud y Belleza
-                                                </td>
-                                                <td>
-                                                    <i class="fas fa-arrow-down text-warning mr-3"></i> $50.00
-                                                    <!-- <i class="fas fa-arrow-up text-success mr-3"></i> $50.00 -->
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">
-                                                    BAC
-                                                </th>
-                                                <td>
-                                                    2021/12/06
-                                                </td>
-                                                <td>
-                                                    Dentista
-                                                </td>
-                                                <td>
-                                                    Transacciones bancarias
-                                                </td>
-                                                <td>
-                                                    <i class="fas fa-arrow-up text-success mr-3"></i> $200.00
-                                                    <!-- <i class="fas fa-arrow-up text-success mr-3"></i> $50.00 -->
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -358,6 +280,105 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-white" id="create_movement_submit">Guardar</button>
                     <!-- <button type="button" class="btn btn-link text-white ml-auto" data-dismiss="modal">Cerrar</button> -->
+                </div>
+    
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-notification-control-movimiento" tabindex="-1" role="dialog"
+        aria-labelledby="modal-notification" aria-hidden="true">
+        <div class="modal-dialog modal-danger modal-dialog-centered modal-" role="document">
+            <div class="modal-content bg-gradient-danger">
+    
+                <div class="modal-header">
+                    <h6 class="modal-title" id="modal-title-notification-update">Gestionar movimiento</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+    
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form role="form" id="FormUpdateMovement">
+                                <input type="hidden" id="update_id_movement" />
+                                <div class="form-group">
+                                    <label for="exampleFormControlSelect1">Tipo de cargo</label><br/>
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="UpdatecustomRadioInline1" value="Gasto" name="UpdatecustomRadioInline1" class="custom-control-input" checked>
+                                        <label class="custom-control-label" for="UpdatecustomRadioInline1">Gasto</label>
+                                    </div>
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="UpdatecustomRadioInline2" value="Ingreso" name="UpdatecustomRadioInline1" class="custom-control-input">
+                                        <label class="custom-control-label" for="UpdatecustomRadioInline2">Ingreso</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" id="UpdateListAccountsMovement">
+                                    <label for="UpdateAccountMovement">Seleccione una cuenta</label>
+                                    <select class="form-control" name="UpdateAccountMovement" id="UpdateAccountMovement">
+                                        <!-- <option>Ninguna</option> -->
+                                        <!-- <option>BAC</option> -->
+                                        <!-- <option>LaFise</option> -->
+                                        <!-- <option>Banpro</option> -->
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="UpdateTagMovement">Categoría</label>
+                                    <select class="form-control" name="UpdateTagMovement" id="UpdateTagMovement">
+                                        <option>Hogar</option>
+                                        <option>Alimentos</option>
+                                        <option>Entretenimiento</option>
+                                        <option>Salud y Belleza</option>
+                                        <option>Auto y Transporte</option>
+                                        <option>Educación y Trabajo</option>
+                                        <option>Regalos y Ayuda</option>
+                                        <option>Viajes</option>
+                                        <option>Finanzas e Impuestos</option>
+                                        <option>Ropa y Calzado</option>
+                                        <option>Transacciones bancarias</option>
+                                        <option>Ingresos</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <div class="form-group">
+                                        <label for="UpdateDateMovement">Fecha</label>
+                                        <input class="form-control" type="date" value="2021-12-10" id="UpdateDateMovement">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="cb-badge-update-movement">Tipo de divisa</label><br />
+                                    <label class="custom-toggle">
+                                        <input type="checkbox" id="cb-badge-update-movement" checked>
+                                        <span class="custom-toggle-slider rounded-circle" data-label-off="$" data-label-on="C$"></span>
+                                    </label>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="input-group input-group-merge input-group-alternative">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="span-update-badge-selected-movement">C$</span>
+                                        </div>
+                                        <input class="form-control" id="update_amount_movement" placeholder="* Monto" type="number">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="update_description_movement">Descripción</label>
+                                    <textarea class="form-control" id="update_description_movement" rows="3"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link text-white" id="delete_movement_submit">Eliminar</button>
+                    <button type="button" class="btn btn-white ml-auto" id="update_movement_submit">Actualizar</button>
                 </div>
     
             </div>
