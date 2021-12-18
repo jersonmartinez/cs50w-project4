@@ -187,8 +187,9 @@ function getAccounts() {
         '                <th scope="col">Nombre</th>' +
         '                <th scope="col">Divisa</th>' +
         '                <th scope="col">Saldo Inicial</th>' +
-        '                <th scope="col">Saldo Actual</th>' +
+        // '                <th scope="col">Saldo Actual</th>' +
         '                <th scope="col">Descripción</th>' +
+        '                <th scope="col">Proyección</th>' +
         '                <th scope="col">Estado</th>' +
         '            </tr>' +
         '        </thead>' +
@@ -219,17 +220,376 @@ function getAccounts() {
 
                 for (var i = 0; i < data_accounts.length; i++) {
 
-                    Data += '<tr onclick="javascript: getAccountById(this);" data-toggle="modal" data-target="#modal-notification-control-cuenta" id="tr_item_account_' + data_accounts[i].id + '" id_account="' + data_accounts[i].id +'" class="tr_list_accounts">' +
-                        '    <th scope="row">' + data_accounts[i].name + '</th>' +
-                        '    <td>' + data_accounts[i].currency + '</td>' +
-                        '    <td>' + data_accounts[i].currency + data_accounts[i].amount + '.00' + '</td>' +
-                        '    <td>' + data_accounts[i].currency + data_accounts[i].amount + '.00' + '</td>' +
-                        '    <td>' + data_accounts[i].description + '</td>' +
-                        '    <td>' + '<i class="fas fa-arrow-up text-success mr-3"></i>' + '</td>' +
+                    Data += '<tr>' +
+                        '    <th scope="row" onclick="javascript: getAccountById(this);" data-toggle="modal" data-target="#modal-notification-control-cuenta" id="tr_item_account_' + data_accounts[i].id + '" id_account="' + data_accounts[i].id +'" class="tr_list_accounts">' + data_accounts[i].name + '</th>' +
+                        '    <td class="tr_list_accounts">' + data_accounts[i].currency + '</td>' +
+                        '    <td class="tr_list_accounts">' + data_accounts[i].currency + data_accounts[i].amount + '.00' + '</td>' +
+                        // '    <td class="tr_list_accounts">' + data_accounts[i].currency + data_accounts[i].amount + '.00' + '</td>' +
+                        '    <td class="tr_list_accounts">' + data_accounts[i].description + '</td>' +
+                        '    <td class="tr_list_accounts">' + '<i class="fas fa-arrow-up text-success mr-3"></i>' + '</td>' +
+                        '    <td>' + '<button class="btn btn-icon btn-primary" onclick="javascript: getTotalMovements(this);" divisa="' + data_accounts[i].currency + '" saldo_inicial="' + data_accounts[i].amount + '" name_account="' + data_accounts[i].name +'" type="button" data-toggle="modal" data-target="#modal-notification-check-cuenta"><span class="btn-inner--icon"><i class="ni ni-atom"></i> Revisar</span></button>' + '</td>' +
                         '</tr>';
                 }
                 
                 $("#dashboard_accounts").html(Initial + TableInit + Data + TableFinish + Finish);
+            }
+        }
+    });
+}
+
+function getTotalMovements(value){
+    var name_account = $(value).attr('name_account');
+    var saldo_inicial = $(value).attr('saldo_inicial');
+    var divisa = $(value).attr('divisa');
+
+    console.log(saldo_inicial);
+
+    $("#dashboard_check_status").html(Spinner);
+
+    Initial = '<div class="card-header border-0">' +
+        '    <div class="row align-items-center">' +
+        '        <div class="col">' +
+        '            <h3 class="mb-0">Movimientos: ' + name_account + '</h3>' +
+        '        </div>' +
+        '        <div class="col text-right">' +
+        '            <!-- <a href="#!" class="btn btn-sm btn-primary">Ver todo</a> -->' +
+        '        </div>' +
+        '    </div>' +
+        '</div>';
+
+    TableInit = '<div class="table-responsive">' +
+        '    <table class="table align-items-center table-flush">' +
+        '        <thead class="thead-light">' +
+        '            <tr>' +
+        '                <th scope="col">Descripción</th>' +
+        '                <th scope="col">Monto</th>' +
+        '                <th scope="col">Cargo</th>' +
+        '            </tr>' +
+        '        </thead>' +
+        '        <tbody>';
+
+    TableFinish = '</tbody>' +
+        '    </table>';
+
+    Finish = '</div></div>';
+
+    var valor_cordobas = 0;
+    var valor_cordobas_ingreso = 0;
+    var valor_cordobas_gastos = 0;
+    var valor_dolares = 0;
+    var valor_dolares_ingreso = 0;
+    var valor_dolares_gastos = 0;
+    var resultado_diferencial_dolar = 0;
+    var resultado_diferencial_cordoba = 0;
+
+    console.log(name_account);
+
+    $.ajax({
+        url: "/get_total_movements",
+        type: "post",
+        dataType: 'json',
+        contentType: "application/json; charset=UTF-8",
+        data: { 'account': name_account},
+        success: function (datos) {
+            if (datos == 'there_is_not_records') {
+                $("#dashboard_check_status").html(Initial + "<p>No hay datos</p>" + Finish);
+            } else {
+                data_movements = datos;
+                console.log(data_movements);
+
+                Data = "";
+
+                for (var i = 0; i < data_movements.length; i++) {
+
+                    if (data_movements[i].account == name_account){
+
+                        if (data_movements[i].currency == 'C$'){
+                            valor_cordobas += parseInt(data_movements[i].amount);
+                        } else {
+                            valor_dolares += parseInt(data_movements[i].amount);
+                        }
+
+                        if (data_movements[i].type_charge == 'Ingreso'){
+                            up_down = '<i class="fas fa-arrow-up text-success mr-3"></i>';
+
+                            if (data_movements[i].currency == 'C$'){
+                                valor_cordobas_ingreso += parseInt(data_movements[i].amount);
+
+
+                                if (divisa == 'C$') {
+                                    resultado_diferencial_cordoba += ((parseInt(saldo_inicial) - parseInt(valor_cordobas_gastos)) + parseInt(valor_cordobas_ingreso));
+                                    resultado_diferencial_dolar += ((parseInt(saldo_inicial * 35) - parseInt(valor_dolares_gastos * 35)) + parseInt(valor_dolares_ingreso * 35));
+                                } else if (divisa == '$') {
+                                    resultado_diferencial_cordoba += ((parseInt(saldo_inicial / 35) - parseInt(valor_cordobas_gastos / 35)) + parseInt(valor_cordobas_ingreso / 35));
+                                    resultado_diferencial_dolar += ((parseInt(saldo_inicial) - parseInt(valor_dolares_gastos)) + parseInt(valor_dolares_ingreso));
+                                }
+
+                            } else {
+                                valor_dolares_ingreso += parseInt(data_movements[i].amount);
+
+                                if (divisa == 'C$') {
+                                    resultado_diferencial_cordoba += ((parseInt(saldo_inicial) + parseInt(valor_cordobas_gastos)) + parseInt(valor_cordobas_ingreso));
+                                    resultado_diferencial_dolar += ((parseInt(saldo_inicial * 35) + parseInt(valor_dolares_gastos * 35)) + parseInt(valor_dolares_ingreso * 35));
+                                } else if (divisa == '$') {
+                                    resultado_diferencial_cordoba += ((parseInt(saldo_inicial / 35) + parseInt(valor_cordobas_gastos / 35)) + parseInt(valor_cordobas_ingreso / 35));
+                                    resultado_diferencial_dolar += ((parseInt(saldo_inicial) + parseInt(valor_dolares_gastos)) + parseInt(valor_dolares_ingreso));
+                                }
+
+                            }
+
+                        } else {
+                            up_down = '<i class="fas fa-arrow-down text-warning mr-3"></i>';
+                            
+                            if (data_movements[i].currency == 'C$'){
+                                valor_cordobas_gastos += parseInt(data_movements[i].amount);
+                            } else {
+                                valor_dolares_gastos += parseInt(data_movements[i].amount);
+                            }
+                        }
+
+                        Data += '<tr>' +
+                            '    <th scope="row">' + data_movements[i].description + '</th>' +
+                            '    <td>' + data_movements[i].currency + data_movements[i].amount + '.00' + '</td>' +
+                            '    <td>' + up_down + '</td>' +
+                            '</tr>';
+                    }
+                }
+
+                InfoIngresosTotales = '<br/><br/><p>Ingresos totales</p><div class="row">' +
+                    '    <div class="col-lg-6 col-xl-6">' +
+                    '        <div class="card card-stats mb-4 mb-xl-0">' +
+                    '            <div class="card-body">' +
+                    '                <div class="row">' +
+                    '                    <div class="col">' +
+                    '                        <h5 class="card-title text-uppercase text-muted mb-0">Cordobas</h5>' +
+                    '                        <span class="h2 font-weight-bold mb-0">C$' + valor_cordobas_ingreso + '</span>' +
+                    '                    </div>' +
+                    '                    <div class="col-auto">' +
+                    '                        <div class="icon icon-shape bg-danger text-white rounded-circle shadow">' +
+                    '                            <i class="fas fa-chart-bar"></i>' +
+                    '                        </div>' +
+                    '                    </div>' +
+                    '                </div>' +
+                    '            </div>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '    <div class="col-lg-6 col-xl-6">' +
+                    '        <div class="card card-stats mb-4 mb-xl-0">' +
+                    '            <div class="card-body">' +
+                    '                <div class="row">' +
+                    '                    <div class="col">' +
+                    '                        <h5 class="card-title text-uppercase text-muted mb-0">Dolares</h5>' +
+                    '                        <span class="h2 font-weight-bold mb-0">$' + valor_dolares_ingreso + '</span>' +
+                    '                    </div>' +
+                    '                    <div class="col-auto">' +
+                    '                        <div class="icon icon-shape bg-warning text-white rounded-circle shadow">' +
+                    '                            <i class="fas fa-chart-pie"></i>' +
+                    '                        </div>' +
+                    '                    </div>' +
+                    '                </div>' +
+                    '            </div>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '</div>';
+
+                InfoGastosTotales = '<br/><br/><p>Gastos totales</p><div class="row">' +
+                    '    <div class="col-lg-6 col-xl-6">' +
+                    '        <div class="card card-stats mb-4 mb-xl-0">' +
+                    '            <div class="card-body">' +
+                    '                <div class="row">' +
+                    '                    <div class="col">' +
+                    '                        <h5 class="card-title text-uppercase text-muted mb-0">Cordobas</h5>' +
+                    '                        <span class="h2 font-weight-bold mb-0">C$' + valor_cordobas_gastos + '</span>' +
+                    '                    </div>' +
+                    '                    <div class="col-auto">' +
+                    '                        <div class="icon icon-shape bg-danger text-white rounded-circle shadow">' +
+                    '                            <i class="fas fa-chart-bar"></i>' +
+                    '                        </div>' +
+                    '                    </div>' +
+                    '                </div>' +
+                    '            </div>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '    <div class="col-lg-6 col-xl-6">' +
+                    '        <div class="card card-stats mb-4 mb-xl-0">' +
+                    '            <div class="card-body">' +
+                    '                <div class="row">' +
+                    '                    <div class="col">' +
+                    '                        <h5 class="card-title text-uppercase text-muted mb-0">Dolares</h5>' +
+                    '                        <span class="h2 font-weight-bold mb-0">$' + valor_dolares_gastos + '</span>' +
+                    '                    </div>' +
+                    '                    <div class="col-auto">' +
+                    '                        <div class="icon icon-shape bg-warning text-white rounded-circle shadow">' +
+                    '                            <i class="fas fa-chart-pie"></i>' +
+                    '                        </div>' +
+                    '                    </div>' +
+                    '                </div>' +
+                    '            </div>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '</div>';
+
+                if (divisa == '$'){
+                    copia_saldo_inicial = (parseInt(saldo_inicial) - parseInt(valor_dolares_gastos));
+
+                    ResultadoDiferencial = '<br/><br/><p>Diferencia</p><div class="row">' +
+                        '    <div class="col-lg-6 col-xl-6">' +
+                        '        <div class="card card-stats mb-4 mb-xl-0">' +
+                        '            <div class="card-body">' +
+                        '                <div class="row">' +
+                        '                    <div class="col">' +
+                        '                        <h5 class="card-title text-uppercase text-muted mb-0">Cordobas</h5>' +
+                        '                        <span class="h2 font-weight-bold mb-0">C$' + (parseInt(copia_saldo_inicial * 35) - parseInt(valor_cordobas_gastos) * 35) + '</span>' +
+                        // '                        <span class="h2 font-weight-bold mb-0">C$' + resultado_diferencial_cordoba + '</span>' +
+                        '                    </div>' +
+                        '                    <div class="col-auto">' +
+                        '                        <div class="icon icon-shape bg-danger text-white rounded-circle shadow">' +
+                        '                            <i class="fas fa-chart-bar"></i>' +
+                        '                        </div>' +
+                        '                    </div>' +
+                        '                </div>' +
+                        '            </div>' +
+                        '        </div>' +
+                        '    </div>' +
+                        '    <div class="col-lg-6 col-xl-6">' +
+                        '        <div class="card card-stats mb-4 mb-xl-0">' +
+                        '            <div class="card-body">' +
+                        '                <div class="row">' +
+                        '                    <div class="col">' +
+                        '                        <h5 class="card-title text-uppercase text-muted mb-0">Dolares</h5>' +
+                        '                        <span class="h2 font-weight-bold mb-0">$' + (parseInt(saldo_inicial) - parseInt(valor_dolares_gastos)) + '</span>' +
+                        // '                        <span class="h2 font-weight-bold mb-0">$' + resultado_diferencial_dolar + '</span>' +
+                        '                    </div>' +
+                        '                    <div class="col-auto">' +
+                        '                        <div class="icon icon-shape bg-warning text-white rounded-circle shadow">' +
+                        '                            <i class="fas fa-chart-pie"></i>' +
+                        '                        </div>' +
+                        '                    </div>' +
+                        '                </div>' +
+                        '            </div>' +
+                        '        </div>' +
+                        '    </div>' +
+                        '</div>';
+                } else {
+                    copia_saldo_inicial = (parseInt(saldo_inicial) - parseInt(valor_cordobas_gastos));
+
+                    ResultadoDiferencial = '<br/><br/><p>Diferencia</p><div class="row">' +
+                        '    <div class="col-lg-6 col-xl-6">' +
+                        '        <div class="card card-stats mb-4 mb-xl-0">' +
+                        '            <div class="card-body">' +
+                        '                <div class="row">' +
+                        '                    <div class="col">' +
+                        '                        <h5 class="card-title text-uppercase text-muted mb-0">Córdobas</h5>' +
+                        '                        <span class="h2 font-weight-bold mb-0">C$' + (parseInt(copia_saldo_inicial) - parseInt(valor_cordobas_gastos)) + '</span>' +
+                        // '                        <span class="h2 font-weight-bold mb-0">C$' + resultado_diferencial_cordoba + '</span>' +
+                        '                    </div>' +
+                        '                    <div class="col-auto">' +
+                        '                        <div class="icon icon-shape bg-danger text-white rounded-circle shadow">' +
+                        '                            <i class="fas fa-chart-bar"></i>' +
+                        '                        </div>' +
+                        '                    </div>' +
+                        '                </div>' +
+                        '            </div>' +
+                        '        </div>' +
+                        '    </div>' +
+                        '    <div class="col-lg-6 col-xl-6">' +
+                        '        <div class="card card-stats mb-4 mb-xl-0">' +
+                        '            <div class="card-body">' +
+                        '                <div class="row">' +
+                        '                    <div class="col">' +
+                        '                        <h5 class="card-title text-uppercase text-muted mb-0">Dólares</h5>' +
+                        '                        <span class="h2 font-weight-bold mb-0">$' + (parseInt(saldo_inicial / 35) - parseInt(valor_dolares_gastos)) + '</span>' +
+                        // '                        <span class="h2 font-weight-bold mb-0">$' + resultado_diferencial_dolar + '</span>' +
+                        '                    </div>' +
+                        '                    <div class="col-auto">' +
+                        '                        <div class="icon icon-shape bg-warning text-white rounded-circle shadow">' +
+                        '                            <i class="fas fa-chart-pie"></i>' +
+                        '                        </div>' +
+                        '                    </div>' +
+                        '                </div>' +
+                        '            </div>' +
+                        '        </div>' +
+                        '    </div>' +
+                        '</div>';
+                }
+
+                ResultadoDiferencial = '<br/><br/><p>Diferencia</p><div class="row">' +
+                    '    <div class="col-lg-6 col-xl-6">' +
+                    '        <div class="card card-stats mb-4 mb-xl-0">' +
+                    '            <div class="card-body">' +
+                    '                <div class="row">' +
+                    '                    <div class="col">' +
+                    '                        <h5 class="card-title text-uppercase text-muted mb-0">Cordobas</h5>' +
+                    '                        <span class="h2 font-weight-bold mb-0">C$' + (parseInt(copia_saldo_inicial * 35) - parseInt(valor_cordobas_gastos) * 35) + '</span>' +
+                    // '                        <span class="h2 font-weight-bold mb-0">C$' + resultado_diferencial_cordoba + '</span>' +
+                    '                    </div>' +
+                    '                    <div class="col-auto">' +
+                    '                        <div class="icon icon-shape bg-danger text-white rounded-circle shadow">' +
+                    '                            <i class="fas fa-chart-bar"></i>' +
+                    '                        </div>' +
+                    '                    </div>' +
+                    '                </div>' +
+                    '            </div>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '    <div class="col-lg-6 col-xl-6">' +
+                    '        <div class="card card-stats mb-4 mb-xl-0">' +
+                    '            <div class="card-body">' +
+                    '                <div class="row">' +
+                    '                    <div class="col">' +
+                    '                        <h5 class="card-title text-uppercase text-muted mb-0">Dolares</h5>' +
+                    '                        <span class="h2 font-weight-bold mb-0">$' + (parseInt(copia_saldo_inicial) - parseInt(valor_dolares_gastos)) + '</span>' +
+                    // '                        <span class="h2 font-weight-bold mb-0">$' + resultado_diferencial_dolar + '</span>' +
+                    '                    </div>' +
+                    '                    <div class="col-auto">' +
+                    '                        <div class="icon icon-shape bg-warning text-white rounded-circle shadow">' +
+                    '                            <i class="fas fa-chart-pie"></i>' +
+                    '                        </div>' +
+                    '                    </div>' +
+                    '                </div>' +
+                    '            </div>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '</div>';
+
+                InfoDivisa = '<br/><br/><p>Movimientos totales</p><div class="row">' +
+                    '    <div class="col-lg-6 col-xl-6">' +
+                    '        <div class="card card-stats mb-4 mb-xl-0">' +
+                    '            <div class="card-body">' +
+                    '                <div class="row">' +
+                    '                    <div class="col">' +
+                    '                        <h5 class="card-title text-uppercase text-muted mb-0">Cordobas</h5>' +
+                    '                        <span class="h2 font-weight-bold mb-0">C$' + valor_cordobas + '</span>' +
+                    '                    </div>' +
+                    '                    <div class="col-auto">' +
+                    '                        <div class="icon icon-shape bg-danger text-white rounded-circle shadow">' +
+                    '                            <i class="fas fa-chart-bar"></i>' +
+                    '                        </div>' +
+                    '                    </div>' +
+                    '                </div>' +
+                    '            </div>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '    <div class="col-lg-6 col-xl-6">' +
+                    '        <div class="card card-stats mb-4 mb-xl-0">' +
+                    '            <div class="card-body">' +
+                    '                <div class="row">' +
+                    '                    <div class="col">' +
+                    '                        <h5 class="card-title text-uppercase text-muted mb-0">Dolares</h5>' +
+                    '                        <span class="h2 font-weight-bold mb-0">$' + valor_dolares + '</span>' +
+                    '                    </div>' +
+                    '                    <div class="col-auto">' +
+                    '                        <div class="icon icon-shape bg-warning text-white rounded-circle shadow">' +
+                    '                            <i class="fas fa-chart-pie"></i>' +
+                    '                        </div>' +
+                    '                    </div>' +
+                    '                </div>' +
+                    '            </div>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '</div>';
+
+                $("#dashboard_check_status").html(Initial + TableInit + Data + TableFinish + Finish + InfoDivisa + InfoIngresosTotales + InfoGastosTotales + ResultadoDiferencial);
             }
         }
     });

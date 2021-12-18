@@ -130,10 +130,10 @@
                                 <div class="dropdown-header noti-title">
                                     <h6 class="text-overflow m-0">Usuario</h6>
                                 </div>
-                                <a href="./preferencias" class="dropdown-item">
+                                <!-- <a href="./preferencias" class="dropdown-item">
                                     <i class="ni ni-ui-04"></i>
                                     <span>Preferencias</span>
-                                </a>
+                                </a> -->
                                 <a href="./logout" class="dropdown-item">
                                     <i class="ni ni-user-run"></i>
                                     <span>Cerrar sesión</span>
@@ -246,59 +246,16 @@
         </div>
         <div class="container-fluid mt--6">
             <div class="row">
-                <div class="col-xl-8">
+                <div class="col-xl-12">
                     <div class="card" id="dashboard_accounts">
                         
                     </div>
                 </div>
-                <div class="col-xl-4">
-                    <div class="card">
-                        <div class="card-header border-0">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <h3 class="mb-0">Movimientos recientes</h3>
-                                </div>
-                                <div class="col text-right">
-                                    <!-- <a href="#!" class="btn btn-sm btn-primary">Ver todo</a> -->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table align-items-center table-flush">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th scope="col">Title</th>
-                                        <th scope="col">Title</th>
-                                        <th scope="col"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">
-                                            Info
-                                        </th>
-                                        <td>
-                                            0,000
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <span class="mr-2">60%</span>
-                                                <div>
-                                                    <div class="progress">
-                                                        <div class="progress-bar bg-gradient-danger" role="progressbar"
-                                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                                            style="width: 60%;"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    
-                                </tbody>
-                            </table>
-                        </div>
+                <!-- <div class="col-xl-4">
+                    <div class="card" id="dashboard_recent_movements">
+                        
                     </div>
-                </div>
+                </div> -->
             </div>
             <footer class="footer pt-0">
                 <div class="row align-items-center justify-content-lg-between">
@@ -435,6 +392,36 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-link text-white" id="delete_account_submit">Eliminar</button>
                     <button type="button" class="btn btn-white ml-auto" id="update_account_submit">Actualizar</button>
+                </div>
+    
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-notification-check-cuenta" tabindex="-1" role="dialog"
+        aria-labelledby="modal-notification" aria-hidden="true">
+        <div class="modal-dialog modal-danger modal-dialog-centered modal-" role="document">
+            <div class="modal-content bg-gradient-warning">
+    
+                <div class="modal-header">
+                    <h6 class="modal-title" id="modal-title-notification">Revisión de cuenta</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+    
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="dashboard_check_status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link text-white ml-auto" data-dismiss="modal">Cerrar</button>
                 </div>
     
             </div>

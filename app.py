@@ -295,6 +295,31 @@ def get_movements():
 
         return json.dumps(row)
 
+@app.route("/get_total_movements", methods=['POST'])
+def get_total_movements():
+    movements = db.execute("SELECT * FROM movements WHERE username=:username ORDER BY id DESC;", {"username": session['username']}).fetchall()
+
+    if not movements:
+        return json.dumps('there_is_not_records')
+    else:
+        row = []
+
+        for item in movements:
+            row.append(
+                {
+                    'id': item['id'],
+                    'account': item['account'],
+                    'date': item['date'],
+                    'tag': item['tag'],
+                    'type_charge': item['type_charge'],
+                    'currency': item['currency'],
+                    'amount': item['amount'],
+                    'description': item['description']
+                }
+            )
+
+        return json.dumps(row)
+
 def get_recent_books():
     books = db.execute("SELECT * FROM books ORDER BY year DESC LIMIT 9").fetchall()
     if not books:
